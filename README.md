@@ -1,131 +1,162 @@
-# FB Messenger Backend Implementation with Cassandra
+Facebook Messenger Backend (Cassandra + FastAPI)
+This project is part of the Distributed Systems course assignment. It involves building a simplified backend for Facebook Messenger using Apache Cassandra for distributed data storage and FastAPI for the API layer.
 
-This repository contains the stub code for the Distributed Systems course assignment to implement a Facebook Messenger backend using Apache Cassandra as the distributed database.
+📐 Architecture Overview
+The project follows a modular FastAPI structure:
 
-## Architecture
+bash
+Copy
+Edit
+app/
+├── api/           # API routes
+├── controllers/   # Business logic
+├── models/        # Cassandra models (to be implemented)
+├── schemas/       # Request/response Pydantic models
+└── db/            # Cassandra DB connection and utilities
+⚙️ Requirements
+Python 3.11+
 
-The application follows a typical FastAPI structure:
+Docker & Docker Compose (recommended)
 
-- `app/`: Main application package
-  - `api/`: API routes and endpoints
-  - `controllers/`: Controller logic (stubs provided)
-  - `models/`: Database models (stubs provided, to be implemented by students)
-  - `schemas/`: Pydantic models for request/response validation
-  - `db/`: Database connection utilities (Cassandra client)
+Optional: Local Cassandra setup (for manual development)
 
-## Requirements
+🚀 Quickstart with Docker
+Get the app running with minimal setup:
 
-- Docker and Docker Compose (for containerized development environment)
-- Python 3.11+ (for local development)
+Clone the repository
 
-## Quick Setup with Docker
+Install Docker and Docker Compose
 
-This repository includes a Docker setup to simplify the development process. All you need to get started is:
+Run the setup script:
 
-1. Clone this repository
-2. Make sure Docker and Docker Compose are installed on your system
-3. Run the initialization script:
-   ```
-   ./init.sh
-   ```
-
+bash
+Copy
+Edit
+./init.sh
 This will:
-- Start both FastAPI application and Cassandra containers
-- Initialize the Cassandra keyspace and tables
-- Optionally generate test data for development
-- Make the application available at http://localhost:8000
 
-Access the API documentation at http://localhost:8000/docs
+Start both FastAPI and Cassandra containers
 
-To stop the application:
-```
+Initialize keyspaces and tables
+
+Optionally generate test data
+
+Launch the app at http://localhost:8000
+
+View API docs at http://localhost:8000/docs
+
+To stop the services:
+
+bash
+Copy
+Edit
 docker-compose down
-```
+🧪 Generating Test Data
+To populate the database with sample data:
 
-### Test Data
-
-The setup script includes an option to generate test data for development purposes. This will create:
-
-- 10 test users (with IDs 1-10)
-- 15 conversations between random pairs of users
-- Multiple messages in each conversation with realistic timestamps
-
-You can use these IDs for testing your API implementations. If you need to regenerate the test data:
-
-```
+bash
+Copy
+Edit
 docker-compose exec app python scripts/generate_test_data.py
-```
+This creates:
 
-## Manual Setup (Alternative)
+10 users
 
-If you prefer not to use Docker, you can set up the environment manually:
+15 random conversations
 
-1. Clone this repository
-2. Install Cassandra locally and start it
-3. Create a virtual environment:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-4. Install dependencies:
-   ```
-   uv pip install -r requirements.txt
-   ```
-5. Run the setup script to initialize Cassandra:
-   ```
-   python scripts/setup_db.py
-   ```
-6. Start the application:
-   ```
-   uvicorn app.main:app --reload
-   ```
+Multiple time-stamped messages per conversation
 
-## Cassandra Data Model
+🔧 Manual Setup (Without Docker)
+Clone the repo
 
-For this assignment, you will need to design and implement your own data model in Cassandra to support the required API functionality:
+Install and run Cassandra locally
 
-1. Sending messages between users
-2. Retrieving conversations for a user, ordered by most recent activity
-3. Retrieving messages in a conversation, ordered by timestamp
-4. Retrieving messages before a specific timestamp
+Create a virtual environment:
 
-Your data model should consider:
-- Efficient distribution of data across nodes
-- Appropriate partition keys and clustering columns
-- How to handle pagination efficiently
-- How to optimize for the required query patterns
+bash
+Copy
+Edit
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+Install dependencies:
 
-## Assignment Tasks
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Initialize Cassandra schema:
 
-You need to implement:
+bash
+Copy
+Edit
+python scripts/setup_db.py
+Start the app:
 
-1. Cassandra schema design - create tables to support the required queries
-2. Message and Conversation models (`app/models/`) to interact with Cassandra
-3. Controller methods in the stub classes (`app/controllers/`):
-   - Send Message from one user to another (only the DB interaction parts here. No need to implement websocket etc needed to actually deliver message to other user)
-   - Get Recent Conversations of a user (paginated)
-   - Get Messages in a particular conversation (paginated)
-   - Get Messages in a conversation prior to a specific timestamp (paginated)
+bash
+Copy
+Edit
+uvicorn app.main:app --reload
+🧱 Cassandra Data Modeling
+Design your Cassandra schema to efficiently support:
 
-## API Endpoints
+Sending messages between users
 
-### Messages
+Fetching conversations for a user (latest first)
 
-- `POST /api/messages/`: Send a message from one user to another
-- `GET /api/messages/conversation/{conversation_id}`: Get all messages in a conversation
-- `GET /api/messages/conversation/{conversation_id}/before`: Get messages before a timestamp
+Fetching messages in a conversation (by time)
 
-### Conversations
+Fetching messages before a specific timestamp
 
-- `GET /api/conversations/user/{user_id}`: Get all conversations for a user
-- `GET /api/conversations/{conversation_id}`: Get a specific conversation
+📌 Focus on:
 
-## Evaluation Criteria
+Correct partition and clustering keys
 
-- Correct implementation of all required endpoints
-- Proper error handling and edge cases
-- Efficient Cassandra queries (avoid hotspots and ensure good distribution)
-- Code quality and organization
-- Proper implementation of pagination
-- Performance considerations for distributed systems
-- Adherence to Cassandra data modeling best practices 
+Avoiding hotspots
+
+Efficient pagination
+
+Supporting query patterns
+
+🎯 Assignment Objectives
+You must implement:
+
+🔹 Cassandra table schema for messaging and conversations
+
+🔹 Message & Conversation models in app/models/
+
+🔹 Controller logic in app/controllers/:
+
+Send message
+
+Get user conversations (paginated)
+
+Get messages in a conversation (paginated)
+
+Get messages before a timestamp (paginated)
+
+📡 API Overview
+Messages
+POST /api/messages/ → Send a message
+
+GET /api/messages/conversation/{conversation_id} → Fetch conversation messages
+
+GET /api/messages/conversation/{conversation_id}/before?timestamp=... → Messages before a time
+
+Conversations
+GET /api/conversations/user/{user_id} → Fetch user’s conversations
+
+GET /api/conversations/{conversation_id} → Get a conversation by ID
+
+✅ Evaluation Criteria
+✔ Correct functionality & endpoints
+
+✔ Error handling
+
+✔ Efficient and scalable Cassandra queries
+
+✔ Pagination implementation
+
+✔ Code quality and modularity
+
+✔ Adherence to best practices for Cassandra and distributed systems
+
